@@ -7,6 +7,7 @@ RUN  CGO_ENABLED=0 GOOS=linux go build -o /app/exe ./cmd/bot/main.go
 
 FROM alpine:latest
 WORKDIR /app
-RUN apk --no-cache add ca-certificates
+RUN apk --no-cache add ca-certificates tzdata
+ENV TZ=Europe/Berlin
 COPY --from=builder /app/exe .
 CMD ["/app/exe"]
