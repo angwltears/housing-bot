@@ -16,7 +16,7 @@ services:
             KLEINANZEIGEN_URL: ${KLEINANZEIGEN_URL}
             REDIS_URL: ${REDIS_URL}
             TELEGRAM_TOKEN: ${TELEGRAM_TOKEN}
-            WohnungsBoerseURL: ${Wohnungsboerse_URL}
+            WohnungsBoerseURL: ${WOHNUNGSBOERSE_URL}
 volumes:
   redis_data:
 
