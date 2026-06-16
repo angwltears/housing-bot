@@ -7,8 +7,7 @@ services:
         volumes:
             - redis_data:/data
     app_bot:
-
-        image: ghcr.io/angwltears/housing-bot:latest
+        image: ghcr.io/angwltears/housingbot:latest
         restart: always
         depends_on:
             - redis
@@ -17,6 +16,7 @@ services:
             KLEINANZEIGEN_URL: ${KLEINANZEIGEN_URL}
             REDIS_URL: ${REDIS_URL}
             TELEGRAM_TOKEN: ${TELEGRAM_TOKEN}
+            WohnungsBoerseURL: ${Wohnungsboerse_URL}
 volumes:
   redis_data:
 
