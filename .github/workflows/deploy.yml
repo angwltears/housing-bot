@@ -5,28 +5,47 @@ on:
     branches: [ "main" ]
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/housingbot:latest
 
-      - name: Create .env file
-        run: |
-          cat << 'EOF' > .env
-          ${{ secrets.ENV_FILE }}
-          EOF
-
-      - name: Copy files to VPS
+      - name: Create .env file on VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            mkdir -p /app/housingbot
+            cat << 'EOF' > /app/housingbot/.env
+            ${{ secrets.ENV_FILE }}
+            EOF
+      - name: Copy docker-compose to VPS
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SERVER_IP }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "./*"
+          source: "docker-compose.yml"
           target: "/app/housingbot"
-
-      - name: Build and Restart Docker
+      - name: Pull and Restart on VPS
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_IP }}
@@ -34,6 +53,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /app/housingbot
-            docker compose down
-            docker compose up -d --build
+            # Логиним сервер в твой GitHub, чтобы он мог скачать образ
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            docker compose pull
+            docker compose up -d
             docker image prune -f

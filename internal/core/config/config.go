@@ -20,8 +20,9 @@ type RedisConfig struct {
 	URL string `env:"REDIS_URL" env-required:"true"`
 }
 type SiteConfig struct {
-	WgGeshuchtURL    string `env:"WGGESHUCHT_URL" env-required:"true"`
-	KleinanzeigenURL string `env:"KLEINANZEIGEN_URL" env-required:"true"`
+	WgGeshuchtURL     string `env:"WGGESHUCHT_URL" env-required:"true"`
+	KleinanzeigenURL  string `env:"KLEINANZEIGEN_URL" env-required:"true"`
+	WohnungsBoerseURL string `env:"WOHNUNGSBOERSE_URL" env-required:"true"`
 }
 
 func MustLoad(logger *slog.Logger) *Config {

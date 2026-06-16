@@ -13,22 +13,24 @@ import (
 )
 
 type Transport struct {
-	ctx    context.Context
-	bot    *telebot.Bot
-	logger *slog.Logger
-	ID     []int64
-	ch     <-chan service.Data
-	wg     *sync.WaitGroup
+	ctx       context.Context
+	bot       *telebot.Bot
+	logger    *slog.Logger
+	ID        []int64
+	IDMunchen []int64
+	ch        <-chan service.Data
+	wg        *sync.WaitGroup
 }
 
-func NewTransport(ctx context.Context, wg *sync.WaitGroup, bot *telebot.Bot, logger *slog.Logger, ID []int64, ch <-chan service.Data) *Transport {
+func NewTransport(ctx context.Context, wg *sync.WaitGroup, bot *telebot.Bot, logger *slog.Logger, ID []int64, IDMunchen []int64, ch <-chan service.Data) *Transport {
 	return &Transport{
-		ctx:    ctx,
-		bot:    bot,
-		logger: logger,
-		ID:     ID,
-		ch:     ch,
-		wg:     wg,
+		ctx:       ctx,
+		bot:       bot,
+		logger:    logger,
+		ID:        ID,
+		ch:        ch,
+		wg:        wg,
+		IDMunchen: IDMunchen,
 	}
 }
 
@@ -101,6 +103,7 @@ func (t *Transport) Process() {
 					t.logger.Error("failed to send message", "err", err, "advert_id", data.ID)
 				}
 			}
+
 		}
 	}
 }

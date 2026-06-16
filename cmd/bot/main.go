@@ -11,6 +11,7 @@ import (
 	"housingbot/internal/clients/kleinanzeigen"
 	redisclient "housingbot/internal/clients/redis"
 	"housingbot/internal/clients/wggesucht"
+	"housingbot/internal/clients/wohnungsboerse"
 	"housingbot/internal/core/config"
 	"housingbot/internal/core/logger"
 	"housingbot/internal/features/tgBot/service"
@@ -53,11 +54,12 @@ func main() {
 	transportChan := make(chan service.Data, 100)
 	clientChan := make(chan []service.Data, 100)
 
-	transp := transport.NewTransport(ctx, wg, bot, log, []int64{750791661}, transportChan)
+	transp := transport.NewTransport(ctx, wg, bot, log, []int64{750791661, 975016573}, []int64{7283992399}, transportChan)
 	transp.SetupCallbacks()
 	srvc := service.NewService(ctx, log, wg, clientChan, transportChan, redisSession)
 	klein := kleinanzeigen.NewCleinAnzeigen(ctx, log, wg, clientChan, cfg.Site.KleinanzeigenURL)
 	wggsht := wggesucht.NewWggesucht(ctx, log, wg, clientChan, cfg.Site.WgGeshuchtURL)
+	boerse := wohnungsboerse.NewWohnungsboerse(ctx, log, wg, clientChan, cfg.Site.WohnungsBoerseURL)
 	wg.Add(1)
 	go transp.Process()
 	wg.Add(1)
@@ -66,6 +68,8 @@ func main() {
 	go klein.Process()
 	wg.Add(1)
 	go wggsht.Process()
+	wg.Add(1)
+	go boerse.Process()
 	bot.Start()
 	wg.Wait()
 

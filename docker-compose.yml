@@ -7,7 +7,8 @@ services:
         volumes:
             - redis_data:/data
     app_bot:
-        build: .
+
+        image: ghcr.io/angwltears/housing-bot:latest
         restart: always
         depends_on:
             - redis
